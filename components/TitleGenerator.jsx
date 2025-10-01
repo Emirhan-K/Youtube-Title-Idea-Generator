@@ -11,6 +11,8 @@ const TitleGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [copiedTitle, setCopiedTitle] = useState(null);
+  const [customCategory, setCustomCategory] = useState('');
+  const [customTone, setCustomTone] = useState('');
 
   const categories = [
     'Gaming', 'Technology', 'Education', 'Entertainment', 
@@ -40,8 +42,8 @@ const TitleGenerator = () => {
 
     const formData = {
       topic,
-      category,
-      tone,
+      category: category === 'custom' ? customCategory : category,
+      tone: tone === 'custom' ? customTone : tone,
       language
     };
     
@@ -93,7 +95,13 @@ Tip: The better you describe your video topic and terms, the better results you'
               <select
                 id="category"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setCategory(value);
+                  if (value !== 'custom') {
+                    setCustomCategory('');
+                  }
+                }}
                 required
               >
                 <option value="">Select a category</option>
@@ -106,8 +114,9 @@ Tip: The better you describe your video topic and terms, the better results you'
                 <input
                   type="text"
                   placeholder="Write your own category"
-                  onChange={(e) => setCategory(e.target.value)}
-                  style={{marginTop: '10px'}}
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  style={{ marginTop: '10px' }}
                   required
                 />
               )}
@@ -118,7 +127,13 @@ Tip: The better you describe your video topic and terms, the better results you'
               <select
                 id="tone"
                 value={tone}
-                onChange={(e) => setTone(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setTone(value);
+                  if (value !== 'custom') {
+                    setCustomTone('');
+                  }
+                }}
                 required
               >
                 <option value="">Select a tone</option>
@@ -131,8 +146,9 @@ Tip: The better you describe your video topic and terms, the better results you'
                 <input
                   type="text"
                   placeholder="Write your own tone"
-                  onChange={(e) => setTone(e.target.value)}
-                  style={{marginTop: '10px'}}
+                  value={customTone}
+                  onChange={(e) => setCustomTone(e.target.value)}
+                  style={{ marginTop: '10px' }}
                   required
                 />
               )}
