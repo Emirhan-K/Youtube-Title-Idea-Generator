@@ -6,6 +6,8 @@ const TitleGenerator = () => {
   const [category, setCategory] = useState('Technology');
   const [tone, setTone] = useState('Casual');
   const [language, setLanguage] = useState('Turkish');
+  const [apiKey, setApiKey] = useState('');
+  const [model, setModel] = useState('gpt-4');
   
   const [titles, setTitles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +29,13 @@ const TitleGenerator = () => {
     'Turkish', 'English'
   ];
 
+  const models = [
+    'gpt-3.5-turbo',
+    'gpt-4',
+    "gpt-4-turbo",
+    "gpt-4o"
+  ];
+
   const handleCopy = (title) => {
     navigator.clipboard.writeText(title);
     setCopiedTitle(title);
@@ -38,15 +47,22 @@ const TitleGenerator = () => {
     setIsLoading(true);
     setError(null);
     setTitles([]);
-    setCopiedTitle(null);
+
+    if (!apiKey) {
+      setError('API key is required');
+      setIsLoading(false);
+      return;
+    }
 
     const formData = {
+      api_key: apiKey,
       topic,
       category: category === 'custom' ? customCategory : category,
       tone: tone === 'custom' ? customTone : tone,
-      language
+      language,
+      model
     };
-    
+    /*https://web-production-bcaef.up.railway.app/generate-titles*/
     try {
       const response = await fetch('https://web-production-bcaef.up.railway.app/generate-titles', {
         method: 'POST',
@@ -62,7 +78,8 @@ const TitleGenerator = () => {
       }
 
       const data = await response.json();
-      setTitles(data.titles);
+      const splitTitles = data.titles[0].split('\n').filter(title => title.trim() !== ''); // Split by newlines and remove empty lines
+      setTitles(splitTitles);
 
     } catch (err) {
       setError(err.message);
@@ -165,6 +182,32 @@ Tip: The better you describe your video topic and terms, the better results you'
                 <option value="">Select a language</option>
                 {languages.map((lang) => (
                   <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="apiKey">OpenAI API Key:</label>
+              <input
+                type="password"
+                id="apiKey"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Enter your OpenAI API key"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="model">OpenAI Model:</label>
+              <select
+                id="model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                required
+              >
+                {models.map((m) => (
+                  <option key={m} value={m}>{m}</option>
                 ))}
               </select>
             </div>
